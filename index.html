@@ -533,17 +533,15 @@ function doneShare(title, text, note, photos, files){
     '<div class="muted">Данные в Google Таблице. Отправьте в группу вместе с фото:</div>' +
     '<div class="preview">' + esc(text.replace(/\*/g, '')) + '</div>' +
     '<div class="photos" style="justify-content:center">' + photos.map(p => '<div class="ph" style="width:96px;height:96px"><img src="' + p + '"></div>').join('') + '</div>' +
-    '<div class="muted" style="margin-top:12px">' + (IS_IOS
-      ? '<b>Чтобы фото и текст ушли одним сообщением:</b> кнопка → WhatsApp → выберите группу → нажмите на поле <b>«Добавить подпись»</b> → <b>«Вставить»</b> → отправить. Текст уже скопирован.'
-      : 'Нажмите кнопку → WhatsApp → выберите группу → Отправить. Если подписи нет — текст уже скопирован, вставьте его.') + '</div>' + (note ? '<div class="muted">' + esc(note) + '</div>' : '') + '</div>',
+    '<div class="muted" style="margin-top:12px">Нажмите кнопку → WhatsApp → выберите группу → Отправить. ' +
+      'Если подпись не встала под фото — нажмите на поле «Добавить подпись» → «Вставить» (текст уже скопирован).</div>' + (note ? '<div class="muted">' + esc(note) + '</div>' : '') + '</div>',
     '<button class="btn wa" style="margin-bottom:8px" id="dShare">📤 Отправить фото и текст</button>' +
     (WA_GROUP_LINK ? '<a class="btn ghost" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px" target="_blank" rel="noopener" href="' + esc(WA_GROUP_LINK) + '">Открыть группу</a>' : '') +
     '<button class="btn ghost" id="dOk">Готово</button>');
   $('#dOk').onclick = closeSheet;
   $('#dShare').onclick = () => {
-    copyText(text); // на iPhone текст вставляется в поле подписи из буфера
-    // iPhone при передаче текста вместе с фото отправляет их двумя сообщениями — передаём только фото
-    navigator.share(IS_IOS ? {files} : {files, text}).catch(err => {
+    copyText(text); // запасной вариант: если подпись не встала — вставить из буфера
+    navigator.share({files, text}).catch(err => {
       if (err && err.name === 'AbortError') return;
       // браузер не дал поделиться файлами — показываем обычный вариант
       toast('Меню «Поделиться» недоступно, текст скопирован', true);
