@@ -20,7 +20,7 @@
   header .brand{font-weight:700;font-size:17px;flex:1}
   header .meta{text-align:right;font-size:13px;line-height:1.2;opacity:.9}
   header .meta b{font-size:17px;display:block;font-variant-numeric:tabular-nums}
-  #demoBar{background:#fef3c7;color:#78350f;font-size:13px;padding:8px 16px;text-align:center}
+  #demoBar{background:#d42a3a;color:#fff;font-weight:700;font-size:13px;padding:8px 16px;text-align:center}
   .view{display:none;padding-top:14px}
   .view.active{display:block}
   h2{font-size:20px;margin:6px 2px 12px}
@@ -125,7 +125,7 @@
   <div class="brand">⚙️ ДСК · Простои</div>
   <div class="meta"><b id="clock">--:--</b><span id="shiftLabel"></span></div>
 </header>
-<div id="demoBar" hidden>Демо-режим: данные хранятся только в этом браузере</div>
+<div id="demoBar" hidden>⚠️ Форма НЕ подключена к таблице — записи не сохраняются. Нужна ссылка API_URL.</div>
 
 <div class="wrap">
   <section id="v-now" class="view active">
@@ -198,7 +198,7 @@ const EXPECTED = [{l:'15 мин',v:15},{l:'30 мин',v:30},{l:'1 ч',v:60},{l:'
 const WA_GROUP_LINK = 'https://chat.whatsapp.com/IUHKJJvf7AL623JbESpSVP';
 // Ссылка на развёрнутый скрипт (…/exec). Нужна, только если эта страница размещена отдельно
 // (например, на GitHub Pages), чтобы фото уходили в WhatsApp вместе с текстом.
-const API_URL = '';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzvWoAwDwao8ijxqhLJSLjuaWQ-_3Xev9OoHazt0uptaGbyzJk1_Ge45ijVVmHHWOQ2/exec';
 const DAY_START = 8, NIGHT_START = 20;
 const MAX_PHOTOS = 4;
 const PHOTO_REQUIRED = false;  // true — без фото запись не отправится
@@ -559,7 +559,7 @@ $('#btnStop').onclick = () => openStop('stop');
 $('#btnNote').onclick = () => openStop('fact');
 
 /* ================= ДЕМО (работает, когда страница открыта не из Apps Script) ================= */
-const DKEY = 'dsk_demo_v1';
+const DKEY = 'dsk_demo_v2';
 const Demo = {
   _db(){ let d = null; try { d = JSON.parse(localStorage.getItem(DKEY)); } catch(e){}
     if (!d) { d = this._seed(); this._save(d); } return d; },
@@ -569,11 +569,7 @@ const Demo = {
     const mk = (reason, eq, startAgo, mins, by, lb, comment, ph) => { const st = t - startAgo*M; const sh = shiftOf(new Date(st));
       return {id:'D'+st, date:sh.date, shift:sh.name, reason, equipment:eq, start:st, end: mins==null ? null : st+mins*M,
         minutes:mins, expected:null, by, launchedBy:lb, comment, photosStop:ph, photosStart:[], status: mins==null ? 'Стоит' : 'Запущен'}; };
-    return { stops: [
-      mk('Нехватка подачи руды','Вся линия ДСК', 400, 25, 'Айтбайұлы М.', 'Айтбайұлы М.', 'Подача не успевает', []),
-      mk('Отключение питания','Вся линия ДСК', 260, 121, 'Айтбайұлы М.', 'Айтбайұлы М.', 'Остановка питания ориентировочно 2 часа', []),
-      Object.assign(mk('Металлодетектор','Конвейер', 12, null, 'Айтбайұлы М.', '', 'Металл на ленте — коронка от бура', ['demo','demo']), {expected:15}),
-    ], shifts: [] };
+    return { stops: [], shifts: [] };
   },
   getState(){ const d = this._db(); const sh = shiftOf(new Date());
     return { now: Date.now(), active: d.stops.filter(s => s.status === 'Стоит'), recent: d.stops.slice(-60).reverse(),
